@@ -11,7 +11,7 @@ function W = randInitializeWeights(L_in, L_out)
 
 % You need to return the following variables correctly 
 W = zeros(L_out, 1 + L_in);
-
+e = 0.12;
 % ====================== YOUR CODE HERE ======================
 % Instructions: Initialize W randomly so that we break the symmetry while
 %               training the neural network.
@@ -22,7 +22,7 @@ W = zeros(L_out, 1 + L_in);
 
 
 
-
+W =  randn(L_out, 1 + L_in)*(2*e)-e;
 
 
 

@@ -31,9 +31,16 @@ X = [ones(m, 1) X];
 %       
 
 
-
-
-
+for i_example = 1:size(X, 1)
+    for i_theta = 1:num_labels
+        theta = all_theta(i_theta,:);
+        temp(i_theta,:) = sigmoid(X(i_example,:)*theta');
+    end
+    [val, indx] = max(temp);
+    %size(temp)
+    clear temp
+    p(i_example,1)=indx;
+end
 
 
 % =========================================================================

@@ -38,29 +38,30 @@ Theta2_grad = zeros(size(Theta2));
 %         variable J. After implementing Part 1, you can verify that your
 %         cost function computation is correct by verifying the cost
 %         computed in ex4.m
-
-j1 = 1;
-for i = 1020:1020
+regularizationTerm =  (sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2))) * (lambda/(2*m));
+for i = 1:m
     X_1 = [1,X(i,:)]';
     z_2 =  Theta1*X_1;
     a_2Temp = sigmoid(z_2);
     a_2 = [1;a_2Temp];
     z_3 = Theta2*a_2;
     a_3 = sigmoid(z_3);
- %   find(a_3 == max(a_3))
     y_label = zeros(num_labels,1);
+    Jtemp = zeros(num_labels,1);
     val = y(i,1);
-   % val
+    % val
     y_label(val) = 1;
+    
     for i_label = 1:num_labels
         hTheta_k = a_3(i_label,1);
-   %     [y_label(i_label,1) (1-y_label(i_label,1))  (log(1-sigmoid(hTheta_k)))]
-       Jtemp(j1,1) = ((-y_label(i_label,1)*(log(hTheta_k)))-((1-y_label(i_label,1))*(log(1-sigmoid(hTheta_k)))));
-       j1 = j1+1;
+        Jtemp(i_label,1) = -((y_label(i_label,1)*(log(hTheta_k)))+((1-y_label(i_label,1))*(log(1-(hTheta_k)))));
     end
+    
+    J_1(i,1) =  sum(Jtemp)+regularizationTerm;
+    clear Jtemp
 end
-J=J/m;
-J =  Jtemp;
+J=sum(J_1)/m;
+
 
 
 
@@ -93,8 +94,44 @@ J =  Jtemp;
 
 
 
+delta_1 = 0;
+delta_2 = 0;
 
 
+for t = 1:m
+    X_1 = [1,X(t,:)]';
+    a_1 = X_1;
+    
+    z_2 =  Theta1*X_1;
+    a_2Temp = sigmoid(z_2);
+    a_2 = [1;a_2Temp];
+    
+    z_3 = Theta2*a_2;
+    a_3 = sigmoid(z_3);
+    
+    smallDelta_3 =  zeros(num_labels,1);
+    y_label = zeros(num_labels,1);
+    val = y(t,1);
+    y_label(val) = 1;
+    for i_label = 1:num_labels
+        smallDelta_3(i_label,1) =   a_3(i_label,1)-y_label(i_label,1);
+    end
+    
+    smallDelta_2 = (Theta2'*smallDelta_3).*[1;sigmoidGradient(z_2)];
+    smallDelta_2 = smallDelta_2(2:end);
+    
+    
+    delta_2 = delta_2 + smallDelta_3*a_2';
+    delta_1 = delta_1 + smallDelta_2*a_1';
+
+    regularizationTerm_BP_1 =  Theta1(:,2:end) * (lambda/(m));
+    regularizationTerm_BP_2 =  Theta2(:,2:end) * (lambda/(m));
+    Theta2_grad =  delta_2/m;
+    Theta1_grad =  delta_1/m;
+    
+    Theta2_grad(:,2:end) =  Theta2_grad(:,2:end) + regularizationTerm_BP_2;
+    Theta1_grad(:,2:end) =  Theta1_grad(:,2:end) + regularizationTerm_BP_1;
+end
 
 
 
